@@ -15,26 +15,27 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
 <div>
-  <nav class="navbar navbar-default">
+  <nav class="navbar navbar-default navbar-expand-lg">
 
-  <div class="container-fluid">
-    <a href="https://chefing.fr/"><img src="https://media.discordapp.net/attachments/427578589530292233/709196532947091456/google-shopping-icon-66_1.png"></a>
+    
+  <div class="container-fluid collapse navbar-collapse">
+    
     <ul class="nav navbar-nav">
-      <li routerLinkActive="active"><nuxt-link to="/auth"><strong>identification</strong></nuxt-link></li>
-      <li routerLinkActive="active"><nuxt-link to="/list"><strong>liste de course</strong></nuxt-link></li>
+      <a class="navbar-brand" href="https://www.troov.com/"><img src="https://www.troov.com/images/logo-dark.png"></a>
+      <li class="nav-item" routerLinkActive="active"><nuxt-link class="nav-link" to="/auth"><strong>identification</strong></nuxt-link></li>
+      <li class="nav-item" routerLinkActive="active"><nuxt-link class="nav-link" to="/list"><strong>liste de course</strong></nuxt-link></li>
     </ul>
-    <a href="https://chefing.fr/"><img src="https://chefing.fr/wp-content/uploads/2020/01/logo_chefing_blanc.png" ></a>
   </div>
 </nav>
 
 
 
+
 <div class="container">
-  <div class="block"></div>
 
 
   <div class="row">
-    <nuxt-child/>
+    <nuxt-child  :appPut="this.put" :appSuppr="this.suppr"/>
     <!-- <NuxtLink to="/">Home page</NuxtLink> -->
   </div>
 </div>
@@ -50,8 +51,8 @@
             <input v-model="form.titleInput" class="searchInput" type="text"  name="title" placeholder="nom" required>
 
           <input v-model="form.nbInput" class="nbInput"  type="number" name="nb" placeholder="nb" required>
-          <input v-model="form.hiddenInput" id="id" name="id" hidden />
-            <button class="searchButton" type="submit" v-on:click="onSubmit">
+          <input v-model="form.hiddenIdInput" id="id" name="id" hidden />
+            <button class="searchButton" type="button" v-on:click="sub">
                 <i class="material-icons">
                     >
                 </i>
@@ -81,8 +82,8 @@ export default {
       title : 'troov',
       isPut : false,
       form: {
-        hiddenInput: null,
-        nbInput: null,
+        hiddenIdInput: null,
+        nbInput: 1,
         titleInput: null
       }
 
@@ -90,13 +91,13 @@ export default {
   },
 
   computed: {
-    getLineData() {
-
+    getItems() {
+      return this.$store.getters["troov/getItems"];
     },
   },
   watch: {
-    isRealtime(value) {
-
+    getItems(value) {
+      console.log("CHANGE!", value)
     },
   },
   mounted() {
@@ -110,32 +111,48 @@ export default {
   },
 
   put(id, stuff) {
-    this.hiddenInput.nativeElement.value = id;
-    this.titleInput.nativeElement.value = stuff.title;
-    this.nbInput.nativeElement.value = stuff.nb;
+      console.log("3")
+    
+    this.form.hiddenIdInput = id;
+    this.form.titleInput = stuff.title;
+    this.form.nbInput = stuff.nb;
     this.isPut = true;
+      console.log("4")
   },
 
-  onSubmit() {
+  sub() {
     if (this.isPut) {
-      const put = [
-        this.form.titleInput,
-        this.form.nbInput,
-        this.form.hiddenInput,
-      ];
+      const put = {
+        titleInput: this.form.titleInput,
+        nbInput: this.form.nbInput,
+        hiddenIdInput: this.form.hiddenIdInput,
+      };
 
-      this.Request.putReqFromServer(put);
+      console.log("wiw")
+      console.log(put)
+      this.$store.dispatch("troov/putItems", put).then(()=>{
+
+    this.$store.dispatch("troov/getItems"); 
+    });
       this.isPut = false;
-      this.form.reset();
-      this.Refresh();
     }else{
-      this.$store.dispatch("troov/newReqFromServer", this.form);
+      this.$store.dispatch("troov/newReqFromServer", this.form).then(()=>{
+
+    this.$store.dispatch("troov/getItems"); 
+    });
     }
+    this.form = {
+        hiddenIdInput: null,
+        nbInput: 1,
+        titleInput: null
+      }
   },
 
   suppr(id) {
-    this.Request.supprReqFromServer(id);
-    this.Refresh();
+    this.$store.dispatch("troov/supprItems", id).then(()=>{
+
+    this.$store.dispatch("troov/getItems"); 
+    });
   }
   },
 };
@@ -146,74 +163,58 @@ export default {
 
 
 nav{
-
    z-index: 1;
-  background-color: rgb(15, 22, 31);
+  background-color: rgb(6, 68, 77);
   height: 100px;
   border-color: transparent;
-
   box-shadow: 0px 5px 10px black;
 }
-
 footer{
-  background-color: rgb(15, 22, 31);
+  background-color: rgb(6, 68, 77);
   height: 85px;
   bottom: 0px;
   width: 100%;
   z-index: 1;
   position: fixed;
-
 }
-
 footer > .container > form{
   padding-top: 3%;
   padding-left: 15%;
   position: relative;
 }
-
-
-
 .container{
   color: white;
 }
-
 .nav > li > a {
   padding: 41px 60px;
   font-size: 15px;
-
 }
-
 .nav > li{
   right: -250px;
 }
-
-
 .block{
    z-index: 0;
   width: 125px;
   height: 144%;
-
   position: absolute;
-
   top: 92px;
   left:0 ;
-
   background-image:linear-gradient(to right, rgb(19, 27, 39), rgb(32, 64, 92) 80%);
 }
-
 img{
   width: 100px;
   position: relative;
 right: 430px;
-
 }
-
 /* ////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
+body{
+background-color: rgb(3, 131, 148);
+}
 
 *{
   box-sizing: unset;
 }
-
 .searchBox {
   position: absolute;
   top: -140%;
@@ -223,14 +224,11 @@ right: 430px;
   height: 40px;
   border-radius: 40px;
   padding: 10px;
-
 }
-
 .searchBox:hover > .searchButton {
 background: white;
 color : #2f3640;
 }
-
 .searchButton {
   color: white;
   float: right;
@@ -243,7 +241,6 @@ color : #2f3640;
   align-items: center;
   transition: 0.4s;
 }
-
 .nbInput {
   border:none;
   background: none;
@@ -266,7 +263,5 @@ color : #2f3640;
   line-height: 40px;
    width: 440px;
 }
-
-
 
 </style>

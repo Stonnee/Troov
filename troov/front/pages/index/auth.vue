@@ -15,9 +15,9 @@
 
 
 
-        <button class="btn btn-success" v-if="authStatus" type="button" v-on:click="sub" >Se connecter</button>
-        <button class="btn btn-danger" v-if="!authStatus" type="button" v-on:click="onSignOut" >Se déconnecter</button><br>
-        <a routerLink="/register">enregistrement</a>
+        <button class="btn btn-success" v-if="this.getIsAuth" type="button" v-on:click="sub" >Se connecter</button>
+        <button class="btn btn-danger" v-if="!this.getIsAuth" type="button" v-on:click="onSignOut" >Se déconnecter</button><br>
+        <a class="register" routerLink="/register">enregistrement</a>
 
   </form>
 
@@ -37,7 +37,6 @@ export default {
           email: null,
           password: null
         },
-        authStatus: false,
     };
   },
 
@@ -54,9 +53,7 @@ export default {
 
   onSignOut() {
 
-    this.authService.signOut();
-
-    this.authStatus = this.authService.isAuth;
+    this.$store.commit('troov/setIsAuth', false);
   },
 
   sub() {
@@ -94,7 +91,7 @@ input{
 padding: 30px;
 }
 
-a{
+.register{
   position: relative;
   right: 300px;
 }

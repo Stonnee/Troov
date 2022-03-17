@@ -24,12 +24,12 @@
 
 export default {
   name: "HelloWorld",
-  props: {
-    msg: String,
-  },
+  props: [
+    "appSuppr",
+    "appPut"
+  ],
   data: function () {
     return {
-      reqSubscription: Subscription,
     };
   },
 
@@ -44,23 +44,23 @@ export default {
     },
   },
   mounted() {
-     this.$store.dispatch("troov/getItems").then(()=>{
-
-console.log(this.getItems)
-     });
+     this.$store.dispatch("troov/getItems");
   },
 
   methods: {
     put(id){
-
+      console.log("1")
     const stuff = this.getItems.find((stuff) => {
       return stuff._id === id;
     });
-    this.app.put(id, stuff);
+      console.log("2")
+
+    this.appPut(id, stuff);
+    //this.$store.dispatch("troov/putItems",{id, stuff});
   },
 
   suppr(id){
-    this.app.suppr(id);
+    this.appSuppr(id);
   }
   },
 };
@@ -72,47 +72,33 @@ console.log(this.getItems)
 .box{
 padding-left: 25%;
 padding-top: 10%;
-
 }
-
 h1{
   margin-top: -70px;
   margin-bottom: 80px;
 }
-
 #btnT, #btnP, #btnC{
   border-radius: 40%;
   width: 45px;
   height: 40px;
-
 }
-
 .play_ground{
 padding-bottom: 14%;
 position: relative;
 right: 150px;
-
 }
-
 .box > form{
   position: relative;
 }
-
 li{
   list-style-type: none;
   padding: 20px;
-
 }
-
 .container{
-
   padding-left: 10%;
   padding-top: 0%;
-
 }
-
 h1{ font-family: "Bowlby One"; font-size: 43px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 23px; }
 h3 { font-family: "Bowlby One"; font-size: 17px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 23px; }
-
 
 </style>
